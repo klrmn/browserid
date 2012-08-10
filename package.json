@@ -19,9 +19,10 @@
         "gobbledygook": "0.0.3",
         "mustache": "0.3.1-dev",
         "jwcrypto": "0.4.2",
+        "lockdown": "0.0.1",
         "mysql": "0.9.5",
-        "nodemailer": "0.3.21",
         "mkdirp": "0.3.0",
+        "nodemailer": "0.3.21",
         "optimist": "0.2.8",
         "postprocess": "0.2.4",
         "semver": "1.0.12",
@@ -43,6 +44,7 @@
         "jshint": "0.7.1"
     },
     "scripts": {
+        "preinstall": "./scripts/npm_lockdown",
         "postinstall": "node ./scripts/generate_ephemeral_keys.js",
         "test": "./scripts/test",
         "start": "node ./scripts/run_locally.js"
