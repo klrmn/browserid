@@ -7,14 +7,19 @@
 import pytest
 
 from base import BaseTest
+from pages.home import HomePage
 
 # test cases not supported for myfavoritebeer
 @pytest.mark.persona
 class TestNewUser(BaseTest):
     
-    def test_new_primary_user(mozwebqa):
+    def test_new_primary_user_unauthenticated(self, mozwebqa):
+        homepage = HomePage(mozwebqa.selenium, mozwebqa.timeout)
         pass
 
-    def test_new_secondary_user(mozwebqa):
+    def test_new_primary_user_authenticated(self, mozwebqa):
+        pass
+
+    def test_new_secondary_user(self, mozwebqa):
         # take from 123done.tests.test_new_user::test_can_create_new_user_account
         pass

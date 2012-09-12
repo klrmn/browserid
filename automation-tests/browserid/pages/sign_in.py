@@ -31,6 +31,7 @@ class SignIn(Base):
     _your_computer_content_locator = (By.ID, 'your_computer_content')
     _this_is_my_computer_locator = (By.ID, 'this_is_my_computer')
     _this_is_not_my_computer_locator = (By.ID, 'this_is_not_my_computer')
+    _verify_with_primary_locator = (By.ID, 'verifyWithPrimary')
 
     def __init__(self, selenium, timeout, expect='new'):
         Base.__init__(self, selenium, timeout)
@@ -151,6 +152,12 @@ class SignIn(Base):
                     *self._verify_email_locator).is_displayed())
         else:
             raise Exception('Unknown expect value: %s' % expect)
+
+    def click_sign_in_with_primary(self):
+        """Clicks the 'sign in with <primary>' button."""
+        self.selenium.find_element(*self._verify_with_primary_locator).click()
+        from eyedee import eyedee
+        return eyedee(self.selenium, self.timeout)
 
     def click_sign_in(self):
         """Clicks the 'sign in' button."""

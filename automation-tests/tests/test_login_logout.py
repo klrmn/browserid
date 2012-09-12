@@ -33,6 +33,9 @@ class TestLoginLogout(BaseTest):
         # take from browserid.tests.check_sign_in::test_sign_in_is_this_your_computer
         pass
 
+    def test_login_email_picker(self, mozwebqa):
+        pass
+        
     def test_this_is_my_computer(self, mozwebqa):
         # next login should not require password
         pass

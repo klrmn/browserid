@@ -13,18 +13,18 @@ from base import BaseTest
 class TestVerification(BaseTest):
     
     # not applicable for persona server
-    def test_verify_on_same_browser_should_redirect(self, mozwebqa):
+    def test_verify_on_same_browser_should_redirect_to_client_site(self, mozwebqa):
         # use self.create_restmail_user()
         pass
 
-    def test_verify_on_different_browser_should_ask_for_password(self, mozwebqa):
+    def test_verify_on_different_browser_should_ask_for_password_and_redirect_to_persona_server(self, mozwebqa):
         # use self.create_personatestuser_user(verified=False)
         pass
 
     @pytest.mark.persona
     @pytest.mark.not_123done
     @pytest.mark.xfail(reason="#2465")
-    def test_verify_on_persona_server_should_redirect_to_home(self, mozwebqa):
+    def test_verify_on_persona_server_should_redirect_to_management_page(self, mozwebqa):
         # use self.create_restmail_user()
         pass
 

@@ -9,23 +9,23 @@ import pytest
 from base import BaseTest
 
 @pytest.mark.skip_selenium
-class TestBasic(BaseTest):
+class TestHealth(BaseTest):
 
-    def github_is_available(self, mozwebqa):
+    def test_github_is_available(self, mozwebqa):
         pass
 
-    def restmail_is_available(self, mozwebqa):
+    def test_restmail_is_available(self, mozwebqa):
         pass
 
-    def eyedee_is_available(self, mozwebqa):
+    def test_eyedee_is_available(self, mozwebqa):
         pass
 
-    def personatestuser_is_available(self, mozwebqa):
+    def test_personatestuser_is_available(self, mozwebqa):
         pass
         
-    def persona_server_is_available(self, mozwebqa):
+    def test_persona_server_is_available(self, mozwebqa):
         pass
 
-    def client_site_is_available(self, mozwebqa):
+    def test_client_site_is_available(self, mozwebqa):
         pass
     

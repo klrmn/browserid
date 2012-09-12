@@ -26,9 +26,21 @@ class BaseTest(object):
         print user  # important for debugging
         return user
 
-    def create_eyedee_user():
-        '''Creates a primary user on eyedee.me and returns it.'''
-        pass
+    def create_eyedee_user(registered=True):
+        '''Creates a primary user on eyedee.me and returns it.
+
+        ::Args::
+        - registered - if false, just generate email and password (default True)
+        '''
+        from browserid.mocks.user import MockUser
+        user = MockUser()
+        user.primary_email = user.primary_email.replace('restmail.org', 'eyedee.me')
+        if registered:
+            from browserid.pages.eyedee import eyedee
+            eyedee_page = eyedee(self.selenium, self.timeout)
+            eyedee_page.create_user(user.id, user.password)
+        return user
+
 
     def create_restmail_user():
         '''Creates a verified secondary user using include.js and returns it.
