@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import pytest
+
+
+class BaseTest(object):
+    
+    def create_personatestuser_user(verified=True, env=None):
+        '''Create a verified secondary user on personatestuser.org, and returns it.
+        Use this method if you do not need to access additional emails later.
+        Use this method if you do not want to be logged on as a precondition.
+        '''
+        from browserid import BrowserID
+        bidpom = BrowserID(mozwebqa.selenium, mozwebqa.timeout)
+        if 'dev' in mozwebqa.base_url:
+            env = 'dev'
+        elif 'anosrep' in mozwebqa.base_url:
+            env = 'stage'
+        else:
+            env = 'prod'
+        user = bidpom.persona_test_user(env=env, verified=verified)
+        print user  # important for debugging
+        return user
+
+    def create_eyedee_user():
+        '''Creates a primary user on eyedee.me and returns it.'''
+        pass
+
+    def create_restmail_user():
+        '''Creates a verified secondary user using include.js and returns it.
+        Use this method if you will need to access additional emails later.
+        Use this method if you wish to be left logged in as a precondition.
+        '''
+        from browserid.mocks.user import MockUser
+        user = MockUser()
+
+        # create the user
+        from pages.home import HomePage
+        home = HomePage(mozwebqa)
+        signup = home.click_sign_up()
+        signup.sign_up(user.primary_email, user.password)
+
+        # do email verification
+        from browserid.pages.complete_registration import CompleteRegistration
+        complete_registration = CompleteRegistration(mozwebqa,
+            self.get_confirm_url_from_email(user.primary_email),
+            expect='redirect')
+
+
+        # go sign out and reload page for preconditions
+        account_manager = AccountManager(mozwebqa)
+        account_manager.load_page()
+        account_manager.sign_out()
+        self.clear_browser(mozwebqa)
+        home.load_page() # test will instantiate HomePage
+
+        return user
+
+    def clear_browser(self, mozwebqa):
+        mozwebqa.selenium.execute_script('localStorage.clear()')
+
+    def get_confirm_url_from_email(self, email, message_count=1, regex='(https?:.*?token=.{48})'):
+        '''
+        Checks the restmail inbox for the specified address
+        and returns the confirm url.
+        Specify message_count if you expect there to be more than one message for the user.
+        Specify regex if you wish to use a specific regex. By default searches for a url with a 48 char token."
+        '''
+        import re
+        from browserid.tests import restmail
+
+        mail = restmail.get_mail(email, message_count=message_count, timeout=60)
+        message_text = mail[message_count - 1]['text']
+        return re.search(regex, message_text).group(0)
