@@ -27,7 +27,7 @@ class CompleteRegistration(Base):
         """
         Base.__init__(self, selenium, timeout)
         if url:
-            print "the url" + url
+            print "the url: " + url
             self.selenium.get(url)
 
         if expect == 'redirect':
