@@ -256,3 +256,45 @@ class SignIn(Base):
         """Signs in with the stored user."""
         self.click_sign_in_returning_user()
 
+
+class ServerSignIn(SignIn):
+    # i don't actually know at this point to what extent the server sign in page
+    # differs from the popup sign in page. while it will probably have mostly the
+    # same api, the locators at least may be different
+
+    # _email_locator = (By.ID, 'email')
+    _next_locator = (By.ID, 'next')
+    _sign_in_locator = (By.ID, 'signIn')
+    _verify_email_locator = (By.ID, 'verifyEmail')
+    # _password_locator = (By.ID, 'password')
+    # _verify_password_locator = (By.ID, 'vpassword')
+    _forgot_password_locator = (By.CSS_SELECTOR, 'a.forgot')
+    _reset_password_locator = (By.CSS_SELECTOR, '#signUpForm button')
+    _verify_with_primary_locator = (By.ID, 'authWithPrimary')
+
+    def __init__(self, selenium, timeout, expect='new'):
+        Base.__init__(self, selenium, timeout)
+
+        # if expect == 'new':
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._email_locator).is_displayed())
+        # elif expect == 'returning':
+        #     WebDriverWait(self.selenium, self.timeout).until(
+        #         lambda s: s.find_element(
+        #             *self._sign_in_returning_user_locator).is_displayed())
+        #     import time
+        #     time.sleep(2) # TODO: Remove this sleep
+        # else:
+        #     raise Exception('Unknown expect value: %s' % expect)
+
+    def switch_to_main_window(self):
+        pass
+
+    def close_window(self):
+        pass
+
+    def click_sign_in_with_primary(self):
+        """Clicks the 'sign in with <primary>' button."""
+        self.selenium.find_element(*self._verify_with_primary_locator).click()
+        from eyedee import eyedee
+        return eyedee(self.selenium, self.timeout)
