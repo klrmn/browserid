@@ -4,6 +4,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import time
+
 from base import Base
 
 from selenium.webdriver.common.by import By
@@ -150,6 +152,16 @@ class SignIn(Base):
             WebDriverWait(self.selenium, self.timeout).until(
                 lambda s: s.find_element(
                     *self._verify_email_locator).is_displayed())
+        elif expect == 'idp':
+            WebDriverWait(self.selenium, self.timeout).until(
+                lambda s: s.find_element(
+                    *self._verify_with_primary_locator).is_displayed())
+        elif expect == 'popup_self_close':
+            # XXX it would be nice to wait for something here
+            # but i can't get the popup to hold still long enough
+            # to figure out what
+            time.sleep(10)
+            self.switch_to_main_window()
         else:
             raise Exception('Unknown expect value: %s' % expect)
 
@@ -157,7 +169,7 @@ class SignIn(Base):
         """Clicks the 'sign in with <primary>' button."""
         self.selenium.find_element(*self._verify_with_primary_locator).click()
         from eyedee import eyedee
-        return eyedee(self.selenium, self.timeout)
+        return eyedee(self.selenium, self.timeout, handle=self._main_window_handle)
 
     def click_sign_in(self):
         """Clicks the 'sign in' button."""
@@ -243,3 +255,4 @@ class SignIn(Base):
     def sign_in_returning_user(self):
         """Signs in with the stored user."""
         self.click_sign_in_returning_user()
+
