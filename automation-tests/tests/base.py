@@ -70,16 +70,20 @@ class BaseTest(object):
     def clear_browser(self, mozwebqa):
         mozwebqa.selenium.execute_script('localStorage.clear()')
 
-    def get_confirm_url_from_email(self, email, message_count=1, regex='(https?:.*?token=.{48})'):
+    def get_confirm_url_from_email(self, email, message_index=0):
         '''
         Checks the restmail inbox for the specified address
         and returns the confirm url.
         Specify message_count if you expect there to be more than one message for the user.
         Specify regex if you wish to use a specific regex. By default searches for a url with a 48 char token."
         '''
-        import re
-        from browserid.tests import restmail
 
-        mail = restmail.get_mail(email, message_count=message_count, timeout=60)
-        message_text = mail[message_count - 1]['text']
-        return re.search(regex, message_text).group(0)
+        from browserid.tests.restmail import RestmailInbox
+        inbox = RestmailInbox(email)
+        message = inbox.find_by_index(message_index)
+        url = message.verify_user_link
+        return url
+
+    def confirm_email(self, mozwebqa, url, expect='redirect'):
+        from browserid.pages.complete_registration import CompleteRegistration
+        complete_registration = CompleteRegistration(mozwebqa.selenium, mozwebqa.timeout, url, expect=expect)

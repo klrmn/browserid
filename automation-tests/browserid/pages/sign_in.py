@@ -271,6 +271,7 @@ class ServerSignIn(SignIn):
     _forgot_password_locator = (By.CSS_SELECTOR, 'a.forgot')
     _reset_password_locator = (By.CSS_SELECTOR, '#signUpForm button')
     _verify_with_primary_locator = (By.ID, 'authWithPrimary')
+    _check_email_at_locator = (By.ID, 'sentToEmail')
 
     def __init__(self, selenium, timeout, expect='new'):
         Base.__init__(self, selenium, timeout)
