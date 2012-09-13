@@ -160,7 +160,7 @@ class SignIn(Base):
             # XXX it would be nice to wait for something here
             # but i can't get the popup to hold still long enough
             # to figure out what
-            time.sleep(10)
+            time.sleep(15)
             self.switch_to_main_window()
         else:
             raise Exception('Unknown expect value: %s' % expect)

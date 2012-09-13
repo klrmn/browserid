@@ -8,8 +8,8 @@ import pytest
 
 
 class BaseTest(object):
-    
-    def create_personatestuser_user(verified=True, env=None):
+
+    def create_personatestuser_user(self, mozwebqa, verified=True, env=None):
         '''Create a verified secondary user on personatestuser.org, and returns it.
         Use this method if you do not need to access additional emails later.
         Use this method if you do not want to be logged on as a precondition.
@@ -23,26 +23,27 @@ class BaseTest(object):
         else:
             env = 'prod'
         user = bidpom.persona_test_user(env=env, verified=verified)
-        print user  # important for debugging
+        print user  # for debugging purposes
         return user
 
-    def create_eyedee_user(registered=True):
+    def create_eyedee_user(self, mozwebqa, registered=True):
         '''Creates a primary user on eyedee.me and returns it.
 
         ::Args::
         - registered - if false, just generate email and password (default True)
         '''
         from browserid.mocks.user import MockUser
-        user = MockUser()
-        user.primary_email = user.primary_email.replace('restmail.org', 'eyedee.me')
+        user = MockUser(hostname='eyedee.me')
         if registered:
             from browserid.pages.eyedee import eyedee
-            eyedee_page = eyedee(self.selenium, self.timeout)
+            eyedee_page = eyedee(mozwebqa.selenium, mozwebqa.timeout)
             eyedee_page.create_user(user.id, user.password)
+
+        print user  # for debugging purposes
         return user
 
 
-    def create_restmail_user():
+    def create_restmail_user(self, mozwebqa, verified=True):
         '''Creates a verified secondary user using include.js and returns it.
         Use this method if you will need to access additional emails later.
         Use this method if you wish to be left logged in as a precondition.
@@ -56,20 +57,14 @@ class BaseTest(object):
         signup = home.click_sign_up()
         signup.sign_up(user.primary_email, user.password)
 
-        # do email verification
-        from browserid.pages.complete_registration import CompleteRegistration
-        complete_registration = CompleteRegistration(mozwebqa,
-            self.get_confirm_url_from_email(user.primary_email),
-            expect='redirect')
+        if verified:
+            # do email verification
+            from browserid.pages.complete_registration import CompleteRegistration
+            complete_registration = CompleteRegistration(mozwebqa.selenium, mozwebqa.timeout,
+                self.get_confirm_url_from_email(user.primary_email),
+                expect='redirect')
 
-
-        # go sign out and reload page for preconditions
-        account_manager = AccountManager(mozwebqa)
-        account_manager.load_page()
-        account_manager.sign_out()
-        self.clear_browser(mozwebqa)
-        home.load_page() # test will instantiate HomePage
-
+        print user  # for debugging purposes
         return user
 
     def clear_browser(self, mozwebqa):

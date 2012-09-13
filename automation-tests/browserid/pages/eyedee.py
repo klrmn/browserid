@@ -24,11 +24,16 @@ class eyedee(Base):
 
     def __init__(self, selenium, timeout=60, handle=None):
         Base.__init__(self, selenium=selenium, timeout=timeout, handle=handle)
-        time.sleep(10)
-        for handle in selenium.window_handles:
-            selenium.switch_to_window(handle)
-            if 'EyeDee.Me' in selenium.title:
-                break
+        # if this is created by the SignIn popup, handle will be passed in
+        # and this class will use the existing popup.
+        # if this is created by the ServerSignIn, handle will not be passed
+        # and the popup will be searched for.
+        if not handle:
+            time.sleep(15)
+            for handle in selenium.window_handles:
+                selenium.switch_to_window(handle)
+                if 'EyeDee.Me' in selenium.title:
+                    break
         # selenium.switch_to_window('__persona_dialog')  ## need window name here
 
     def open_page(self):
