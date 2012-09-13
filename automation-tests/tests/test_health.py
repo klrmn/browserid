@@ -11,21 +11,27 @@ from base import BaseTest
 @pytest.mark.skip_selenium
 class TestHealth(BaseTest):
 
+    @pytest.mark.skip_selenium
     def test_github_is_available(self, mozwebqa):
         pass
 
+    @pytest.mark.skip_selenium
     def test_restmail_is_available(self, mozwebqa):
         pass
 
+    @pytest.mark.skip_selenium
     def test_eyedee_is_available(self, mozwebqa):
         pass
 
+    @pytest.mark.skip_selenium
     def test_personatestuser_is_available(self, mozwebqa):
         pass
         
+    @pytest.mark.skip_selenium
     def test_persona_server_is_available(self, mozwebqa):
         pass
 
+    @pytest.mark.skip_selenium
     def test_client_site_is_available(self, mozwebqa):
         pass
     
