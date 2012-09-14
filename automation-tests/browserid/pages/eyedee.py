@@ -11,15 +11,32 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from base import Base
 
+def create_eyedee_user_by_api(username, password):
+    import requests
+    import json
+    headers = {'content-type': 'application/json'}
+    params = {
+        'user': username,
+        'pass': password
+    }
+    result = requests.post(
+        'http://eyedee.me/api/signin', 
+        data=json.dumps(params),
+        headers=headers)
+
+    assert result.status_code == requests.codes.ok
+    print result.text
 
 class eyedee(Base):
 
     _page_url = 'http://eyedee.me'
     _username_locator = (By.ID, 'username')
-    _password_locator = (By.CSS_SELECTOR, 'div#signup #password')
+    _create_password_locator = (By.CSS_SELECTOR, 'div#signup #password')
     _new_password_locator = (By.ID, 'new_password')
-    _sign_in_link_locator = (By.CSS_SELECTOR, 'a.signin')
-    _sign_in_button_locator = (By.CSS_SELECTOR, 'div#signup form > button') # change to #sign_in
+    _main_password_locator = (By.CSS_SELECTOR, 'div#main #password')
+    _sign_up_link_locator = (By.CSS_SELECTOR, 'a.signin')
+    _sign_up_button_locator = (By.CSS_SELECTOR, 'div#signup form > button') # change to #sign_in
+    _sign_in_button_locator = (By.ID, 'sign_in')
     _create_account_locator = (By.ID, 'create_account')
 
     def __init__(self, selenium, timeout=60, handle=None):
@@ -39,8 +56,8 @@ class eyedee(Base):
     def open_page(self):
         self.selenium.get(self._page_url)
         WebDriverWait(self.selenium, self.timeout).until(
-            lambda s: s.find_element(*self._sign_in_link_locator).is_displayed())
-        self.selenium.find_element(*self._sign_in_link_locator).click()
+            lambda s: s.find_element(*self._sign_up_link_locator).is_displayed())
+        self.selenium.find_element(*self._sign_up_link_locator).click()
 
     @property
     def username(self):
@@ -56,17 +73,39 @@ class eyedee(Base):
         field.clear()
         field.send_keys(value)
 
+    # eyedee.me has 3 different password fields with the same id
+    # - sign up
+    # - sign in
+    # - create user
+
     @property
     def password(self):
         WebDriverWait(self.selenium, self.timeout).until(
-            lambda s: s.find_element(*self._password_locator).is_displayed())
-        return self.selenium.find_element(*self._password_locator).get_attribute('value')
+            lambda s: s.find_element(*self._main_password_locator).is_displayed())
+        return self.selenium.find_element(*self._main_password_locator).get_attribute('value')
 
     @password.setter
     def password(self, value):
         WebDriverWait(self.selenium, self.timeout).until(
-            lambda s: s.find_element(*self._password_locator).is_displayed())
-        field = self.selenium.find_element(*self._password_locator)
+            lambda s: s.find_element(*self._main_password_locator).is_displayed())
+        # really really sure...
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._main_password_locator).is_displayed())
+        field = self.selenium.find_element(*self._main_password_locator)
+        field.clear()
+        field.send_keys(value)
+
+    @property
+    def create_password(self):
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._create_password_locator).is_displayed())
+        return self.selenium.find_element(*self._create_password_locator).get_attribute('value')
+
+    @create_password.setter
+    def create_password(self, value):
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._create_password_locator).is_displayed())
+        field = self.selenium.find_element(*self._create_password_locator)
         field.clear()
         field.send_keys(value)
 
@@ -94,13 +133,22 @@ class eyedee(Base):
         time.sleep(10)
         self.switch_to_main_window()
 
+    def click_sign_up(self):
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._sign_up_button_locator).is_displayed())
+        self.selenium.find_element(*self._sign_up_button_locator).click()
+        time.sleep(10)
+        self.switch_to_main_window()
+
     def click_sign_in(self):
         WebDriverWait(self.selenium, self.timeout).until(
             lambda s: s.find_element(*self._sign_in_button_locator).is_displayed())
         self.selenium.find_element(*self._sign_in_button_locator).click()
+        time.sleep(10)
+        self.switch_to_main_window()
 
     def create_user(self, username, password):
         self.open_page()
         self.username = username
-        self.password = password
-        self.click_sign_in()
+        self.create_password = password
+        self.click_sign_up()

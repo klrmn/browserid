@@ -156,6 +156,10 @@ class SignIn(Base):
             WebDriverWait(self.selenium, self.timeout).until(
                 lambda s: s.find_element(
                     *self._verify_with_primary_locator).is_displayed())
+            # make very very sure
+            WebDriverWait(self.selenium, self.timeout).until(
+                lambda s: s.find_element(
+                    *self._verify_with_primary_locator).is_displayed())
         elif expect == 'popup_self_close':
             # XXX it would be nice to wait for something here
             # but i can't get the popup to hold still long enough
