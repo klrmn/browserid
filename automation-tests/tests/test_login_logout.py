@@ -7,19 +7,87 @@
 import pytest
 
 from base import BaseTest
+from pages.home import HomePage
 
 # which of these should be supported by myfavoritebeer?
 class TestLoginLogout(BaseTest):
     
-    @pytest.mark.skip_selenium
-    def test_sign_in_with_primary_address(self, mozwebqa):
-        # any verification should be via IdP
-        pass
+    @pytest.mark.persona_server
+    @pytest.mark.mfb
+    def test_sign_in_and_out_with_primary_address_authenticated(self, mozwebqa):
+        user = self.create_eyedee_user(mozwebqa, authenticated=True)
 
-    @pytest.mark.skip_selenium
-    def test_sign_in_with_secondary_address(self, mozwebqa):
-        # should require persona password
-        pass
+        homepage = HomePage(mozwebqa).factory()
+        homepage.open_page()
+        signin = homepage.click_sign_in()
+        signin.email = user.primary_email
+        signin.click_next(expect='popup_self_close')
+
+        assert homepage.is_the_current_page
+        assert homepage.signed_in_user(user) == user.primary_email
+
+        homepage.click_sign_out()
+        assert homepage.signed_out
+
+    @pytest.mark.persona_server
+    @pytest.mark.mfb
+    def test_sign_in_and_out_with_primary_address_unauthenticated(self, mozwebqa):
+        user = self.create_eyedee_user(mozwebqa, authenticated=False)
+
+        homepage = HomePage(mozwebqa).factory()
+        homepage.open_page()
+        signin = homepage.click_sign_in()
+        signin.email = user.primary_email
+        signin.click_next(expect='idp')
+        eyedee = signin.click_sign_in_with_primary()
+        eyedee.password = user.password
+        eyedee.click_sign_in()
+
+        assert homepage.is_the_current_page
+        assert homepage.signed_in_user(user) == user.primary_email
+
+        homepage.click_sign_out()
+        assert homepage.signed_out
+
+    # not logical for persona server, as that's the only place to get an 
+    # authenticated secondary user
+    @pytest.mark.mfb
+    def test_sign_in_and_out_with_secondary_address_authenticated(self, mozwebqa):
+        if 'persona' in mozwebqa.base_url or 'anosrep' in mozwebqa.base_url:
+            pytest.skip("this test is illogical for the persona server")
+            return
+            
+        user = self.create_persona_user(mozwebqa, verified=True)
+
+        homepage = HomePage(mozwebqa).factory()
+        homepage.open_page()
+        signin = homepage.click_sign_in(expect='returning')
+        signin.click_sign_in_returning_user(expect='login')
+
+        assert homepage.is_the_current_page
+        assert homepage.signed_in_user(user) == user.primary_email
+
+        homepage.click_sign_out()
+        assert homepage.signed_out
+
+    @pytest.mark.persona_server
+    @pytest.mark.mfb
+    def test_sign_in_and_out_with_secondary_address_unauthenticated(self, mozwebqa):
+        user = self.create_personatestuser_user(mozwebqa, verified=True)
+
+        homepage = HomePage(mozwebqa).factory()
+        homepage.open_page()
+        signin = homepage.click_sign_in()
+        signin.email = user.primary_email
+        signin.click_next(expect='password')
+        signin.password = user.password
+        signin.click_sign_in()
+
+        assert homepage.is_the_current_page
+        assert homepage.signed_in_user(user) == user.primary_email
+
+        homepage.click_sign_out()
+        assert homepage.signed_out
 
     @pytest.mark.skip_selenium
     def test_initial_login_in_browser(self, mozwebqa):

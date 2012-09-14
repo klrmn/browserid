@@ -26,7 +26,7 @@ class BaseTest(object):
         print user  # for debugging purposes
         return user
 
-    def create_eyedee_user(self, mozwebqa, registered=True):
+    def create_eyedee_user(self, mozwebqa, authenticated=True):
         '''Creates a primary user on eyedee.me and returns it.
 
         ::Args::
@@ -34,14 +34,44 @@ class BaseTest(object):
         '''
         from browserid.mocks.user import MockUser
         user = MockUser(hostname='eyedee.me')
-        if registered:
+
+        if authenticated:
             from browserid.pages.eyedee import eyedee
             eyedee_page = eyedee(mozwebqa.selenium, mozwebqa.timeout)
             eyedee_page.create_user(user.id, user.password)
+        else:
+            from browserid.pages.eyedee import create_eyedee_user_by_api
+            create_eyedee_user_by_api(user.id, user.password)
 
         print user  # for debugging purposes
         return user
 
+    def create_persona_user(self, mozwebqa, verified=True):
+        from browserid.mocks.user import MockUser
+        user = MockUser(hostname='restmail.net')
+
+        if 'dev' in mozwebqa.base_url:
+            host = 'http://login.dev.anosrep.org'
+        elif 'anosrep' in mozwebqa.base_url:
+            host = 'http://login.anosrep.org'
+        else:
+            host = 'http://login.persona.org'
+
+        mozwebqa.selenium.get(host)
+        from pages.home import PersonaServerHome
+        homepage = PersonaServerHome(mozwebqa)
+        signin = homepage.click_sign_up()
+        signin.email = user.primary_email
+        signin.click_next(expect='verify')
+        signin.password = user.password
+        signin.verify_password = user.password
+        signin.click_verify_email()
+
+        if verified:
+            url = self.get_confirm_url_from_email(user.primary_email)
+            self.confirm_email(mozwebqa, url, expect='redirect')
+
+        return user
 
     def create_restmail_user(self, mozwebqa, verified=True):
         '''Creates a verified secondary user using include.js and returns it.

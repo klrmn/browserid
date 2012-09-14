@@ -32,5 +32,5 @@ class TestVerification(BaseTest):
         pass
 
     def test_verify_link_should_expire(self, mozwebqa):
-        pytest.skip(reason="too long for an automated test")
+        pytest.skip("too long for an automated test")
 

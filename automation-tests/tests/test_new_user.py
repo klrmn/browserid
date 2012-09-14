@@ -9,13 +9,16 @@ import time
 
 from base import BaseTest
 from pages.home import HomePage
+from browserid.mocks.user import MockUser
+
 
 class TestNewUser(BaseTest):
 
     @pytest.mark.mfb
     @pytest.mark.persona
     def test_new_primary_user_unauthenticated(self, mozwebqa):
-        user = self.create_eyedee_user(mozwebqa, registered=False)
+        user = MockUser(hostname='eyedee.me')
+        
         homepage = HomePage(mozwebqa).factory()
         homepage.open_page()
         signin = homepage.click_sign_up()
@@ -32,7 +35,7 @@ class TestNewUser(BaseTest):
     @pytest.mark.mfb
     @pytest.mark.persona
     def test_new_primary_user_authenticated(self, mozwebqa):
-        user = self.create_eyedee_user(mozwebqa, registered=True)
+        user = self.create_eyedee_user(mozwebqa, authenticated=True)
         homepage = HomePage(mozwebqa).factory()
         homepage.open_page()
         signin = homepage.click_sign_up()
@@ -49,7 +52,6 @@ class TestNewUser(BaseTest):
             pytest.skip("this test case does not run on mfb")
             return
 
-        from browserid.mocks.user import MockUser
         user = MockUser(hostname='restmail.net')
         homepage = HomePage(mozwebqa).factory()
         homepage.open_page()

@@ -44,11 +44,11 @@ class HomePage(object):
     def is_the_current_page(self):
         return self._page_title in self.selenium.title
 
-    def click_sign_in(self):
+    def click_sign_in(self, expect='new'):
         WebDriverWait(self.selenium, self.timeout).until(
             lambda s: s.find_element(*self._sign_in_locator).is_displayed())
         self.selenium.find_element(*self._sign_in_locator).click()
-        return SignIn(self.selenium, self.timeout)
+        return SignIn(self.selenium, self.timeout, expect=expect)
 
     def click_sign_out(self):
         WebDriverWait(self.selenium, self.timeout).until(
@@ -67,6 +67,12 @@ class HomePage(object):
         WebDriverWait(self.selenium, self.timeout).until(
             lambda s: s.find_element(*self._signed_in_user_locator).is_displayed())
         return self.selenium.find_element(*self._signed_in_user_locator).is_displayed()
+
+    @property
+    def signed_out(self):
+        WebDriverWait(self.selenium, self.timeout).until(
+            lambda s: s.find_element(*self._sign_in_locator).is_displayed())
+        return self.selenium.find_element(*self._sign_in_locator).is_displayed()
 
     def signed_in_user(self, user=None):
         WebDriverWait(self.selenium, self.timeout).until(
