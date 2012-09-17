@@ -30,7 +30,7 @@ class BaseTest(object):
         '''Creates a primary user on eyedee.me and returns it.
 
         ::Args::
-        - registered - if false, just generate email and password (default True)
+        - authenticated - if false, do not create the user with the browser (default True)
         '''
         from browserid.mocks.user import MockUser
         user = MockUser(hostname='eyedee.me')
@@ -47,6 +47,13 @@ class BaseTest(object):
         return user
 
     def create_persona_user(self, mozwebqa, verified=True):
+        '''Creates a restmail user on the persona server using the browser and returns it.
+        Use this method if you will need to access additional emails later.
+        Use this method if you wish to be left logged in to persona as a precondition.
+        
+        ::Args::
+        - verified - if false, the user will not be verified (default True)
+        '''
         from browserid.mocks.user import MockUser
         user = MockUser(hostname='restmail.net')
 
@@ -76,7 +83,10 @@ class BaseTest(object):
     def create_restmail_user(self, mozwebqa, verified=True):
         '''Creates a verified secondary user using include.js and returns it.
         Use this method if you will need to access additional emails later.
-        Use this method if you wish to be left logged in as a precondition.
+        Use this method if you wish to be left logged in to both persona and the RP as a precondition.
+        
+        ::Args::
+        - verified - if false, the user will not be verified (default True)
         '''
         from browserid.mocks.user import MockUser
         user = MockUser()
